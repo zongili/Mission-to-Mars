@@ -16,6 +16,8 @@
       <div class="jumbotron text-center">
         <h1>Mission to Mars</h1>
         <!-- Add a button to activate scraping script -->
+        <!--  -->
+        <!-- use Bootstrap 3 component to style, primary and large button -->
         <p><a class="btn btn-primary btn-lg" href="/scrape" role="button">Scrape New Data</a></p>
       </div>
       <!-- Add section for Mars News -->
@@ -44,10 +46,34 @@
           <!-- Mars Facts -->
           <div class="row" id="mars-facts">
             <h4>Mars Facts</h4>
-            {{ mars.facts | safe }}
+            {{ mars.facts | capitalize | safe}}
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Section for Mars Hemisphere -->
+      <div class="row" id="mars-hemisphere">
+        <!--Bootstrap 3 component, use 12 columns scaled to a midsize desktop display -->
+        <div class="page_header">
+          <h2 class="text-center">Mars Hemisphere</h2>
+          {% for hemisphere in mars.hemispheres %}
+          <div class="col-sm-3">
+            <!-- Adding the hemisphere images as thumbnails -->
+            <div class="thumbnail">
+              <!-- use double curly brackets to insert the image -->
+              <!-- Bootstrap 3 component, if the image doesn't load use responsive image for alt -->
+              <img 
+              src="{{hemisphere.img_url}}" 
+              alt="Responsive image"/>
+              <div class="caption">
+                <!-- use double curly brackets to insert the title of the hemisphere -->
+                <h5>{{hemisphere.title}}</h5>
+              </div>
+            </div>
+          </div>  
+          {% endfor %}
+        </div>
+      </div>
+
   </body>
 </html>

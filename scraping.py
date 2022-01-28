@@ -29,6 +29,7 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
+        "hemispheres": hemisphere_data(browser),
         "last_modified": dt.datetime.now()
     }
         # Stop webdriver and return data
@@ -36,6 +37,7 @@ def scrape_all():
     return data
 
 
+ 
 # we'll be using the browser variable we defined outside the function
 def mars_news(browser):
     executable_path = {'executable_path': ChromeDriverManager().install()}
@@ -140,6 +142,54 @@ def mars_facts():
 # This last block of code tells Flask that our script is complete and ready for action. 
 # The print statement will print out the results of our scraping to our terminal 
 # after executing the code.
+
+# get the mars hemisphere data
+def hemisphere_data(browser) :
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=False)
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars/'
+
+    browser.visit (url)
+    # Optional delay for loading the page
+    browser.is_element_present_by_css('div.list_text', wait_time=1)
+
+    # Parse the resulting html with soup
+    html = browser.html
+    img_soup = soup(html, 'html.parser')
+    #  Create a list to hold the images and titles.
+    hemisphere_image_urls = []
+
+    # Write code to retrieve the image urls and titles for each hemisphere.
+    #find all images
+    all_imgs = img_soup.find_all('div', class_='description')
+
+    # for each link on the main page loop and soup
+    for image in all_imgs: 
+    #   simulate clik on the first link
+        browser.find_by_text(image.find('h3').text).click()
+        img_url, title = hemisphere_scrape(browser.html)
+        hemisphere_image_urls.append({"img_url": img_url, "title": title})
+    #     go back to main page to process the next link
+        browser.back() 
+    # return the scraped data as a list of 
+    # dictionaries with the URL string and title of each hemisphere image
+    return(hemisphere_image_urls)
+
+# do the scraping of img_url and title in this funcion and return them
+def hemisphere_scrape(browser_html):
+    # Parse the resulting html with soup
+    img_soup = soup(browser_html, 'html.parser')
+    try:
+        #     get the title of the link that we want to visit
+        title = img_soup.find('h2', class_ = "title").text
+        #     get the img url searching for Sample text
+        img_url = img_soup.select('li')[0].find('a', text="Sample").get('href')
+    #     create a dictionary that holds the title and the img url
+    except AttributeError:
+        title = None
+        img_url = None 
+    return(img_url, title)
+
 if __name__ == "__main__":
     # If running as script, print scraped data
     print(scrape_all())
